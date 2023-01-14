@@ -182,7 +182,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Random List Eliminator", "Random List Eliminator"))
+        Dialog.setWindowTitle(_translate("Random List Pop", "Random List Pop"))
         self.numberlabel.setText(_translate("Dialog", ""))
         self.exitButton.setText(_translate("Dialog", "Save to File"))
         self.getnumButton.setText(_translate("Dialog", "Get Random Number"))
