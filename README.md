@@ -14,3 +14,4 @@ All without a terminal :)
 - Python 3.11
 - PyQt5
 - Qt Designer
+- randomdict
