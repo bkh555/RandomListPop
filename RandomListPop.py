@@ -9,7 +9,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pickle
-import ast
+import numpy as np
+from randomdict import RandomDict
 from random import choice
 import sys
 
@@ -23,8 +24,9 @@ def validNum(numString):
         
 def initNums(size=24):
     with open('numbers.pickle', 'wb') as f:
-        dict = {}
-        for i in range(1, size + 1):
+        dict = RandomDict()
+        arr = np.arange(1, size + 1)
+        for i in arr:
             dict[i] = i
         pickle.dump(dict, f, protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -45,8 +47,8 @@ def restoreNum(key, dict):
 
 def getRand(dict):
     try:
-        r = choice(list(dict.values()))
-    except IndexError:
+        r = dict.random_key()
+    except KeyError:
         return -1
     delNum(r, dict)
     return r
@@ -98,7 +100,7 @@ class Ui_Dialog(object):
         self.initButton.setAutoFillBackground(False)
         self.initButton.setStyleSheet("QPushButton { background-color:rgba(204, 204, 204, 200) }")
         self.initButton.setObjectName("initButton")
-        self.restoreButton = QtWidgets.QPushButton(Dialog)
+        self.restoreButton = QtWidgets.QPushButton(Dialog, clicked= lambda: self.pressres())
         self.restoreButton.setGeometry(QtCore.QRect(20, 170, 271, 101))
         font = QtGui.QFont()
         font.setFamily("MS Reference Sans Serif")
@@ -120,7 +122,7 @@ class Ui_Dialog(object):
         font.setWeight(50)
         self.i.setFont(font)
         self.i.setObjectName("i")
-        self.deleteButton = QtWidgets.QPushButton(Dialog)
+        self.deleteButton = QtWidgets.QPushButton(Dialog, clicked= lambda: self.pressdel())
         self.deleteButton.setGeometry(QtCore.QRect(20, 310, 271, 101))
         font = QtGui.QFont()
         font.setFamily("MS Reference Sans Serif")
@@ -158,7 +160,7 @@ class Ui_Dialog(object):
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
-    numberDict = {}
+    numberDict = RandomDict()
 
     try: 
         f = open('numbers.pickle', 'rb')
@@ -167,10 +169,6 @@ class Ui_Dialog(object):
         initNums()
         numberDict = readNums()
 
-    def pressget(self):
-        num = getRand(self.numberDict)
-        self.numberlabel.setText(str(num))
-        
     def pressinit(self):
         if self.initlineEdit.text()== "":
             initNums()
@@ -180,10 +178,24 @@ class Ui_Dialog(object):
         else:
             initNums(int(self.initlineEdit.text()))
         self.numberDict = readNums()
+
+    def pressdel(self):
+        if self.deltelineEdit.text().isnumeric():
+            delNum(int(self.deltelineEdit.text()), self.numberDict)
+            self.deltelineEdit.setText("")
+        
+    def pressres(self):
+        if self.restorelineEdit.text().isnumeric():
+            restoreNum(int(self.restorelineEdit.text()), self.numberDict)
+            self.restorelineEdit.setText("")
+
+    def pressget(self):
+        num = getRand(self.numberDict)
+        self.numberlabel.setText(str(num))
         
     def presssave(self):
         writeNums(self.numberDict)
-
+        
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Random List Pop", "Random List Pop"))
