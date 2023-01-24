@@ -6,9 +6,7 @@
 This application acts like a shuffled stack data structure, and also allows you to:
 - Choose the range of numbers for your list
 - Save to disk 
-- Remove a number or restore a removed number (or just edit the storage file)
-
-All without a terminal :)
+- Remove a number or add back a removed number
 
 # Languages and Tools
 - Python 3.11
