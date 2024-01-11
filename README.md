@@ -12,4 +12,6 @@ This application acts like a shuffled stack data structure, and also allows you 
 - Python 3.11
 - PyQt5
 - Qt Designer
-- randomdict
+- randomdict (4 character addition fix version supplied by me, all credit to https://github.com/robtandy/randomdict)
+
+Note: If you are using an older version of Python and randomdict installs via pip with no errors, you can discard the randomdict.py file supplied here.
