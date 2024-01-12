@@ -8,6 +8,8 @@ This application acts like a shuffled stack data structure, and also allows you 
 - Save to disk 
 - Remove a number or add back a removed number
 
+Just use the requirements.txt to install the dependencies via pip and then run the RandomListPop.py file
+
 # Languages and Tools
 - Python 3.11
 - PyQt5
