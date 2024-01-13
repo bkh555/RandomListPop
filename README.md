@@ -11,7 +11,7 @@ This application acts like a shuffled stack data structure, and also allows you 
 Just use the requirements.txt file to install the dependencies via pip and then run the RandomListPop.py file
 
 # Languages and Tools
-- Python 3.11
+- Python 3.12 (Confirmed to work with as old as Python 3.7 as long as pip is updated)
 - PyQt5
 - Qt Designer
 - randomdict (4 character addition fix version supplied by me, all credit to https://github.com/robtandy/randomdict)
