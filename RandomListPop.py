@@ -13,6 +13,15 @@ import numpy as np
 from randomdict import RandomDict
 from random import choice
 import sys
+import subprocess
+import platform
+
+if platform.system() == "Windows":
+    isWindows = True
+    fileName = "numbers.pickle"
+else:
+    isWindows = False
+    fileName = ".numbers.pickle"
 
 def validNum(numString):
     if not numString.isnumeric():
@@ -23,24 +32,40 @@ def validNum(numString):
     return True
         
 def initNums(size=24):
-    with open('numbers.pickle', 'wb') as f:
+    with open('{}'.format(fileName), 'wb') as f:
         dict = RandomDict()
         arr = np.arange(1, size + 1)
         for i in arr:
             dict[i] = i
         pickle.dump(dict, f, protocol=pickle.HIGHEST_PROTOCOL)
 
+    if isWindows:
+        subprocess.run(["attrib","+H",'{}'.format(fileName)],check=True)
+
 def writeNums(dict):
-    with open('numbers.pickle', 'wb') as f:
+    if isWindows:
+        subprocess.run(["attrib","-H",'{}'.format(fileName)],check=True)
+
+    with open('{}'.format(fileName), 'wb') as f:
         pickle.dump(dict, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+    if isWindows:
+        subprocess.run(["attrib","+H",'{}'.format(fileName)],check=True)
         
 def readNums():
-    with open('numbers.pickle', 'rb') as f:
+    with open('{}'.format(fileName), 'rb') as f:
         dict = pickle.load(f)
         return dict
         
 def delNum(key, dict):
-    del dict[key]
+    try:
+        del dict[key]
+    except KeyError:
+        msg = QtWidgets.QMessageBox()
+        msg.setIcon(QtWidgets.QMessageBox.Information)
+        msg.setText('Number {} not found in your list!'.format(key))
+        msg.setWindowTitle("Delete Exception")
+        msg.exec_()
 
 def restoreNum(key, dict):
     dict[key] = key
@@ -54,6 +79,47 @@ def getRand(dict):
     return r
 
 class Ui_Dialog(object):
+    numberDict = RandomDict()
+    try: 
+        f = open('{}'.format(fileName), 'rb')
+        numberDict = readNums()
+    except:
+        initNums()
+        numberDict = readNums()
+        
+    def pressinit(self):
+        if self.initlineEdit.text()== "":
+            if isWindows:
+                subprocess.run(["attrib","-H",'{}'.format(fileName)],check=True)
+            initNums()
+        elif not validNum(self.initlineEdit.text()):
+                self.initlineEdit.setText("")
+                return
+        else:
+            if isWindows:
+                subprocess.run(["attrib","-H",'{}'.format(fileName)],check=True)
+            initNums(int(self.initlineEdit.text()))
+        self.numberDict = readNums()
+
+    def pressdel(self):
+        if self.deltelineEdit.text().isnumeric():
+            delNum(int(self.deltelineEdit.text()), self.numberDict)
+            self.deltelineEdit.setText("")
+        
+    def pressres(self):
+        if self.restorelineEdit.text().isnumeric():
+            restoreNum(int(self.restorelineEdit.text()), self.numberDict)
+            self.restorelineEdit.setText("")
+
+    def pressget(self):
+        num = getRand(self.numberDict)
+        self.numberlabel.setText(str(num))
+        
+    def presssave(self):
+        writeNums(self.numberDict)
+
+# -*- GUI components -*- 
+
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(628, 686)
@@ -156,45 +222,8 @@ class Ui_Dialog(object):
         font.setWeight(50)
         self.label_3.setFont(font)
         self.label_3.setObjectName("label_3")
-
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
-
-    numberDict = RandomDict()
-
-    try: 
-        f = open('numbers.pickle', 'rb')
-        numberDict = readNums()
-    except:
-        initNums()
-        numberDict = readNums()
-
-    def pressinit(self):
-        if self.initlineEdit.text()== "":
-            initNums()
-        elif not validNum(self.initlineEdit.text()):
-                self.initlineEdit.setText("")
-                return
-        else:
-            initNums(int(self.initlineEdit.text()))
-        self.numberDict = readNums()
-
-    def pressdel(self):
-        if self.deltelineEdit.text().isnumeric():
-            delNum(int(self.deltelineEdit.text()), self.numberDict)
-            self.deltelineEdit.setText("")
-        
-    def pressres(self):
-        if self.restorelineEdit.text().isnumeric():
-            restoreNum(int(self.restorelineEdit.text()), self.numberDict)
-            self.restorelineEdit.setText("")
-
-    def pressget(self):
-        num = getRand(self.numberDict)
-        self.numberlabel.setText(str(num))
-        
-    def presssave(self):
-        writeNums(self.numberDict)
         
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
