@@ -15,6 +15,7 @@ from random import choice
 import sys
 import subprocess
 import platform
+import os
 
 if platform.system() == "Windows":
     isWindows = True
@@ -32,28 +33,22 @@ def validNum(numString):
     return True
         
 def initNums(size=24):
-    with open('{}'.format(fileName), 'wb') as f:
+    with open('{}'.format(fileName), 'r+b') as f:
         dict = RandomDict()
         arr = np.arange(1, size + 1)
         for i in arr:
             dict[i] = i
         pickle.dump(dict, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-    if isWindows:
-        subprocess.run(["attrib","+H",'{}'.format(fileName)],check=True)
+        if isWindows:
+            subprocess.run(["attrib","+H",'{}'.format(fileName)],check=True)
 
 def writeNums(dict):
-    if isWindows:
-        subprocess.run(["attrib","-H",'{}'.format(fileName)],check=True)
-
-    with open('{}'.format(fileName), 'wb') as f:
+    with open('{}'.format(fileName), 'r+b') as f:
         pickle.dump(dict, f, protocol=pickle.HIGHEST_PROTOCOL)
-
-    if isWindows:
-        subprocess.run(["attrib","+H",'{}'.format(fileName)],check=True)
         
 def readNums():
-    with open('{}'.format(fileName), 'rb') as f:
+    with open('{}'.format(fileName), 'r+b') as f:
         dict = pickle.load(f)
         return dict
         
@@ -80,26 +75,25 @@ def getRand(dict):
 
 class Ui_Dialog(object):
     numberDict = RandomDict()
-    try: 
-        f = open('{}'.format(fileName), 'rb')
+    if os.path.isfile('{}'.format(fileName)):
         numberDict = readNums()
-    except:
+    else:
+        f = open('{}'.format(fileName), 'wb')
+        f.close();
         initNums()
         numberDict = readNums()
         
     def pressinit(self):
         if self.initlineEdit.text()== "":
-            if isWindows:
-                subprocess.run(["attrib","-H",'{}'.format(fileName)],check=True)
             initNums()
         elif not validNum(self.initlineEdit.text()):
-                self.initlineEdit.setText("")
-                return
-        else:
-            if isWindows:
-                subprocess.run(["attrib","-H",'{}'.format(fileName)],check=True)
+            self.initlineEdit.setText("")
+            return
+        else:   
             initNums(int(self.initlineEdit.text()))
+
         self.numberDict = readNums()
+        self.initlineEdit.setText("")
 
     def pressdel(self):
         if self.deltelineEdit.text().isnumeric():
